@@ -5,13 +5,12 @@
 A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — see how many prompts you sent, how many conversations you had, and how many tokens you burned, one square per day.
 
 <!--
-  Screenshots
-  -----------
-  Drop the two images below into `docs/screenshots/` (see `docs/screenshots/README.md`
-  for how to take them). Until then these blocks render as alt text only.
+  Screenshots — taken with the UI language set to English.
+  Drop the two images into `docs/screenshots/en/` (see `docs/screenshots/README.md`).
+  Until they exist these blocks render as alt text only.
 -->
-![The calendar panel in the DeepSeek Harness Web GUI](docs/screenshots/panel.png)
-![Hovering a day shows its token breakdown](docs/screenshots/tooltip.png)
+![The calendar panel in the DeepSeek Harness Web GUI](docs/screenshots/en/panel.png)
+![Hovering a day shows its token breakdown](docs/screenshots/en/tooltip.png)
 
 ---
 
@@ -41,10 +40,10 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
 ## Install
 
 ```sh
-# From a local checkout (development)
+# From a local checkout 
 dsh plugin --profile desktop add link:/absolute/path/to/dsh-conv-calendar
 
-# From npm (once published)
+# From npm (Recommend)
 dsh plugin --profile web add dsh-conv-calendar
 ```
 
@@ -154,7 +153,7 @@ dsh-conv-calendar/
 │  ├─ index.js           # Host half: counting, backfill, HTTP endpoint
 │  └─ client.js          # Browser half: a hand-written factory bundle (no bundler)
 ├─ tests/                # offline tests, see below
-└─ docs/screenshots/     # README images
+└─ docs/screenshots/     # README images: en/ for this file, zh-CN/ for the Chinese one
 ```
 
 **No build step.** The browser half is written directly in the platform's factory form: `window.__ModuleLoader__.load({ id, factory })` registers a factory, and the module body runs on first use. `react` is resolved from the Host's shared module table.

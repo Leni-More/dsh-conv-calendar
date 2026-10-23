@@ -5,13 +5,12 @@
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 用的 GitHub 风格提交日历 —— 每天发了多少条对话、开了几个会话、烧了多少 token，一格一天，一眼看完。
 
 <!--
-  截图
-  ----
-  把下面两张图放进 `docs/screenshots/`（怎么截见 `docs/screenshots/README.md`）。
+  截图 —— 界面语言设为中文时拍摄。
+  把两张图放进 `docs/screenshots/zh-CN/`（怎么截见 `docs/screenshots/README.md`）。
   放好之前这里只显示替代文本。
 -->
-![DeepSeek Harness Web 界面里的日历面板](docs/screenshots/panel.png)
-![悬停某天会显示 token 拆分](docs/screenshots/tooltip.png)
+![DeepSeek Harness Web 界面里的日历面板](docs/screenshots/zh-CN/panel.png)
+![悬停某天会显示 token 拆分](docs/screenshots/zh-CN/tooltip.png)
 
 ---
 
@@ -41,10 +40,10 @@
 ## 安装
 
 ```sh
-# 本地目录安装（开发用）
+# 本地目录安装
 dsh plugin --profile desktop add link:/绝对路径/dsh-conv-calendar
 
-# 从 npm 安装（发布后）
+# 从 npm 安装（推荐）
 dsh plugin --profile web add dsh-conv-calendar
 ```
 
@@ -154,7 +153,7 @@ dsh-conv-calendar/
 │  ├─ index.js           # 宿主半边：计数、回填、HTTP 接口
 │  └─ client.js          # 浏览器半边：手写的 factory 形式 bundle（无需打包）
 ├─ tests/                # 离线测试，见下文
-└─ docs/screenshots/     # README 配图
+└─ docs/screenshots/     # README 配图：en/ 给英文版，zh-CN/ 给本文件
 ```
 
 **没有构建步骤。** 浏览器半边直接写成平台的 factory 形式：`window.__ModuleLoader__.load({ id, factory })` 注册一个工厂，模块体在首次使用时才执行；`react` 从宿主的共享模块表里解析。

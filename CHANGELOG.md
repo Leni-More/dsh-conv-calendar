@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1]
+
+### Fixed
+
+- **`Intl` formatting follows the plugin's dictionary** instead of `<html lang>`. Switching
+  the GUI language re-renders the panel in place but does not always rewrite the document
+  tag, which left month labels, tooltip dates and the busiest-day card in the previous
+  language beside correctly translated copy.
+
+### Changed
+
+- **The fold test builds its own fixture** when `$DSH_HOME/sessions` is absent, instead of
+  throwing. It asserts the same totals over a generated tree that keeps the interesting
+  shapes: several zstd frames per file, and a forked session repeating its ancestor.
+- **Frame decoding in the tests no longer relies on one decompress call** reading every
+  concatenated zstd frame, which differs between Node versions.
+
 ## [0.1.0]
 
 First public release.
@@ -44,10 +61,7 @@ First public release.
 - **Session history is read via `sessionQuery`** rather than a direct `zstdDecompressSync`:
   the logs are appended frame by frame, and a one-shot decompress yields only the first
   frame on some runtimes.
-- **`Intl` formatting follows the plugin's dictionary** instead of `<html lang>`. Switching
-  the GUI language re-renders the panel in place but does not always rewrite the document
-  tag, which left month labels, tooltip dates and the busiest-day card in the previous
-  language beside correctly translated copy.
 
-[Unreleased]: https://github.com/LeniMore/dsh-conv-calendar/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/LeniMore/dsh-conv-calendar/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Leni-More/dsh-conv-calendar/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Leni-More/dsh-conv-calendar/releases/tag/v0.1.1
+[0.1.0]: https://github.com/Leni-More/dsh-conv-calendar/releases/tag/v0.1.0

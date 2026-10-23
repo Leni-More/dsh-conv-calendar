@@ -172,7 +172,7 @@ section → Publish release**. Set it as the latest release; do not attach a tar
 gh release view v0.1.0            # if the GitHub CLI is installed
 ```
 
-Or open `https://github.com/LeniMore/dsh-conv-calendar/releases`. A good release shows:
+Or open `https://github.com/Leni-More/dsh-conv-calendar/releases`. A good release shows:
 
 - Tag name and title matching `vX.Y.Z`
 - Notes listing what changed (the workflow takes them from `CHANGELOG.md`)

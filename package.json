@@ -1,6 +1,6 @@
 {
   "name": "dsh-conv-calendar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GitHub-style conversation calendar for DeepSeek Harness: prompts, sessions and token usage per day, drawn as a contribution grid in the Web GUI.",
   "type": "module",
   "main": "lib/index.js",
@@ -29,13 +29,13 @@
     "usage",
     "stats"
   ],
-  "homepage": "https://github.com/LeniMore/dsh-conv-calendar#readme",
+  "homepage": "https://github.com/Leni-More/dsh-conv-calendar#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LeniMore/dsh-conv-calendar.git"
+    "url": "git+https://github.com/Leni-More/dsh-conv-calendar.git"
   },
   "bugs": {
-    "url": "https://github.com/LeniMore/dsh-conv-calendar/issues"
+    "url": "https://github.com/Leni-More/dsh-conv-calendar/issues"
   },
   "author": "LeniMore <LeniMore0@gmail.com>",
   "license": "MIT",

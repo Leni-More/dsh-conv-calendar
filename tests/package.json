@@ -1,0 +1,15 @@
+{
+  "name": "dsh-conv-calendar-tests",
+  "private": true,
+  "type": "module",
+  "description": "Offline tests for dsh-conv-calendar. Run `npm install` then `npm test`.",
+  "scripts": {
+    "test": "node token-fold.mjs && node host-contract.mjs && node panel-render.mjs && node panel-states.mjs && node panel-token.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.5",
+    "jsdom": "^26.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

@@ -1,0 +1,8 @@
+# dsh-conv-calendar bundle patch.
+#
+# Inserts the plugin's one row under its package name; the profile resolves it
+# through its own node_modules, and the same row makes the browser half load
+# because the package declares `dsh.client` with platform "web".
+- insert:
+    - id: dsh-conv-calendar
+      name: dsh-conv-calendar

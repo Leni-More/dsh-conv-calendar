@@ -1,0 +1,9 @@
+# Normalize line endings so a Windows checkout keeps the sources as authored.
+* text=auto eol=lf
+
+# PNG/SVG screenshots must stay binary / untouched.
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.woff2 binary

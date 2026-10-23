@@ -186,7 +186,7 @@ Run one on its own with `node token-fold.mjs`, and so on.
 
 | Test | Needs | What it asserts |
 | --- | --- | --- |
-| `token-fold.mjs` | nothing (Node only) | Folds the real session logs and compares every day's input/output/cache/total against an independent pass; legacy v1 days still read; re-recording is idempotent; usage without `cacheReadTokens` normalizes to 0 |
+| `token-fold.mjs` | nothing (Node only) | Folds session logs and compares every day's input/output/cache/total against an independent pass. Uses the real logs under `$DSH_HOME/sessions` when they exist; otherwise it builds a fixture in a temp directory with the same shape — several zstd frames per file, a forked session repeating its ancestor — and asserts the equivalent totals. Also checks legacy v1 days still read, re-recording is idempotent, and usage without `cacheReadTokens` normalizes to 0 |
 | `host-contract.mjs` | cordis | Mounts the Host half in the real cordis runtime with stubbed `webServer` / `sessionQuery`: route registration, injected messages ignored, finished sessions read once, live prompts and reply usage recorded immediately, replies without usage contributing nothing, `HEAD`/`POST` handling, route removal on dispose |
 | `panel-render.mjs` | react, jsdom | 371 cells, month labels, tooltip, metric switching, refresh going through `?refresh=1` |
 | `panel-states.mjs` | react, jsdom | Empty data still draws the grid plus a hint, failure state offers retry, English copy uses correct singular/plural |

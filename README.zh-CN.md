@@ -186,7 +186,7 @@ npm test        # 五个一起跑
 
 | 测试 | 依赖 | 断言内容 |
 | --- | --- | --- |
-| `token-fold.mjs` | 无（纯 Node） | 折叠真实会话日志，逐日对比 input/output/cache/total 与独立统计；v1 旧格式仍可读；重复记录幂等；缺 `cacheReadTokens` 归一为 0 |
+| `token-fold.mjs` | 无（纯 Node） | 折叠会话日志，逐日对比 input/output/cache/total 与独立统计。有 `$DSH_HOME/sessions` 下的真实日志时读真实日志；没有时在临时目录造一份同构 fixture（一个文件多个 zstd 帧、一个 fork 会话重复祖先事件）并断言等价总量。另外校验 v1 旧格式仍可读、重复记录幂等、缺 `cacheReadTokens` 归一为 0 |
 | `host-contract.mjs` | cordis | 在真实 cordis 运行时里挂载宿主半边（桩掉 `webServer` / `sessionQuery`）：路由注册、注入消息被忽略、已结束会话只读一次、实时 prompt 与 reply usage 立即入账、无 usage 的回复不贡献 token、`HEAD`/`POST` 处理、卸载时路由回收 |
 | `panel-render.mjs` | react、jsdom | 371 个格子、月份标签、悬停提示、指标切换、刷新走 `?refresh=1` |
 | `panel-states.mjs` | react、jsdom | 空数据仍画出网格并给提示、失败态可重试、英文单复数正确 |

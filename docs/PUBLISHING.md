@@ -96,3 +96,95 @@ dsh --profile check --no-open --port 3099
 
 Then open `/dsh-conv-calendar/api/summary` with the printed token URL and delete the
 `check` profile afterwards.
+
+---
+
+# GitHub releases
+
+A **Release** is a tag plus release notes on GitHub. It is separate from npm: you can tag
+without publishing, and publish without tagging. Tagging is worth doing because GitHub
+then renders a **Releases** panel, offers source archives per version, and "watch →
+releases only" notifies people.
+
+## Version numbering
+
+This project follows [SemVer](https://semver.org): `MAJOR.MINOR.PATCH` with an optional
+`-rc.N` pre-release suffix, and the git tag carries a `v` prefix.
+
+| Change | Bump | npm tag |
+| --- | --- | --- |
+| Bug fix, no behaviour change for users | `patch` (`0.1.0` → `0.1.1`) | `latest` |
+| New feature, backwards compatible | `minor` (`0.1.1` → `0.2.0`) | `latest` |
+| Breaking change to the config, the state file or the API shape | `major` (`0.2.0` → `1.0.0`) | `latest` |
+| Pre-release for testing | `-rc.1` (`0.2.0-rc.1`) | `next` |
+
+The workflow refuses to release when the tag and `package.json` disagree, so the version
+in `package.json` is the single source of truth.
+
+## Releasing, guided by CI
+
+`.github/workflows/release.yml` reacts to any `v*.*.*` tag. It checks that the tag matches
+`package.json`, syntax-checks both halves, runs the test suite, packs the tarball, then
+creates the GitHub Release with the matching `CHANGELOG.md` section as its notes. If the
+repository secret `NPM_TOKEN` exists it also runs `npm publish`; without it the Release is
+still created and npm is skipped.
+
+To enable the npm half, add an **Automation** token (npm → Access Tokens → Generate New
+Token → *Automation*, which bypasses 2FA) as a repository secret named `NPM_TOKEN` under
+**Settings → Secrets and variables → Actions**.
+
+The sequence for a normal release:
+
+```sh
+# 1. Make sure the changelog describes this version, then commit everything
+git add -A && git commit -m "chore: prepare v0.1.1"
+
+# 2. Bump the version, commit and tag in one step
+npm version patch -m "chore: release v%s"
+
+# 3. Push the commit and the tag
+git push --follow-tags
+```
+
+`git push --follow-tags` is the important part — a plain `git push` sends the commit but
+**not** the tag, so the workflow never fires. If you forget, push the tag explicitly:
+
+```sh
+git push origin v0.1.1
+```
+
+## Releasing by hand
+
+Useful when Actions is unavailable, or for the very first release.
+
+```sh
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+Then on GitHub: **Releases → Draft a new release → choose the tag → paste the changelog
+section → Publish release**. Set it as the latest release; do not attach a tarball —
+`npm pack` output is not a source archive, and GitHub already offers "Source code (zip)".
+
+## Checking a release
+
+```sh
+gh release view v0.1.0            # if the GitHub CLI is installed
+```
+
+Or open `https://github.com/LeniMore/dsh-conv-calendar/releases`. A good release shows:
+
+- Tag name and title matching `vX.Y.Z`
+- Notes listing what changed (the workflow takes them from `CHANGELOG.md`)
+- "Source code (zip)" and "(tar.gz)" archive links
+
+## Release checklist
+
+- [ ] `package.json` version bumped and matches `CHANGELOG.md`
+- [ ] `[Unreleased]` in `CHANGELOG.md` emptied into the new version section
+- [ ] `npm test` passes locally
+- [ ] `npm pack --dry-run` shows only the seven expected files
+- [ ] Tag pushed with `--follow-tags` (or `git push origin vX.Y.Z`)
+- [ ] GitHub Release created and marked latest
+- [ ] npm shows the new version (`npm view dsh-conv-calendar version`), if publishing
+

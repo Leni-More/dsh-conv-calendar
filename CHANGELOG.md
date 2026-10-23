@@ -44,6 +44,10 @@ First public release.
 - **Session history is read via `sessionQuery`** rather than a direct `zstdDecompressSync`:
   the logs are appended frame by frame, and a one-shot decompress yields only the first
   frame on some runtimes.
+- **`Intl` formatting follows the plugin's dictionary** instead of `<html lang>`. Switching
+  the GUI language re-renders the panel in place but does not always rewrite the document
+  tag, which left month labels, tooltip dates and the busiest-day card in the previous
+  language beside correctly translated copy.
 
 [Unreleased]: https://github.com/LeniMore/dsh-conv-calendar/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/LeniMore/dsh-conv-calendar/releases/tag/v0.1.0

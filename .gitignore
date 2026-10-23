@@ -9,6 +9,8 @@ node_modules/
 # Local state and artifacts
 *.log
 state.json
+notes.md
+*.tgz
 .DS_Store
 Thumbs.db
 

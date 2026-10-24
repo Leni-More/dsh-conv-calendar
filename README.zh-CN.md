@@ -44,7 +44,7 @@
 dsh plugin --profile desktop add link:/绝对路径/dsh-conv-calendar
 
 # 从 npm 安装（推荐）
-dsh plugin --profile web add dsh-conv-calendar
+dsh plugin --profile desktop add dsh-conv-calendar
 ```
 
 然后**重启 DeepSeek Harness**。插件是在启动时按 profile 的 bundle 列表装配的，无法热加载进正在运行的宿主。

@@ -1,7 +1,7 @@
 {
   "name": "dsh-conv-calendar",
   "version": "0.1.1",
-  "description": "GitHub-style conversation calendar for DeepSeek Harness: prompts, sessions and token usage per day, drawn as a contribution grid in the Web GUI.",
+  "description": "DeepSeek Harness 的 GitHub 风格对话日历：按天显示提示词、会话和 token 使用量，并在 Web GUI 中绘制为贡献网格。GitHub-style conversation calendar for DeepSeek Harness: prompts, sessions and token usage per day, drawn as a contribution grid in the Web GUI.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

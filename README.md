@@ -44,7 +44,7 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
 dsh plugin --profile desktop add link:/absolute/path/to/dsh-conv-calendar
 
 # From npm (Recommend)
-dsh plugin --profile web add dsh-conv-calendar
+dsh plugin --profile desktop add dsh-conv-calendar
 ```
 
 Then **restart DeepSeek Harness**. Plugins are composed from the profile's bundle list at startup, so a restart is required — the entry cannot hot-load into a running Host.

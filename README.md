@@ -17,7 +17,7 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
 ## Features
 
 - **A sidebar entry.** *Conversation calendar* appears in the Web GUI sidebar; clicking it opens a full-page calendar.
-- **GitHub-style grid.** The last 53 weeks, weeks starting Monday, five shades, one square per local day.
+- **GitHub-style grid.** The whole current calendar year — always a full year of squares, padded out to whole Monday-started weeks, future days included — five shades, one square per local day.
 - **Four metrics.** Switch between **Prompts**, **Conversations**, **Tokens** and **Output**:
 
   | Metric | What one square means |
@@ -27,8 +27,8 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
   | Tokens | Total tokens spent that day (input + output + cache reads) |
   | Output | Tokens the model produced that day |
 
-- **Four stat cards.** Total (with active days), current streak (with longest), this month (with last month), busiest day — all of them follow the selected metric.
-- **Token breakdown.** Under **Tokens** / **Output**, hovering a square also shows `in · out · cached`.
+- **Four stat cards.** This year's total (with active days), current streak (with longest), this month (with last month), this year's busiest day — all of them follow the selected metric. The card figures use the same year scope as the grid; only the streaks keep the full history, because a run can cross 1 January.
+- **Token breakdown.** Under *Tokens* and *Output*, hovering a square also shows the `input · output · cached` split; hovering a future square shows its date alone.
 - **Theme-aware.** Colors come from DSH theme variables, so light and dark mode both look native.
 - **Bilingual.** Follows the UI language (English / Chinese).
 

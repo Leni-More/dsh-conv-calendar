@@ -1,4 +1,4 @@
-﻿// Browser-half smoke test: load the hand-written factory bundle in a jsdom
+// Browser-half smoke test: load the hand-written factory bundle in a jsdom
 // page, mount the panel with a stubbed host route, and assert what a user sees.
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -8,6 +8,16 @@ const nodeRequire = createRequire(import.meta.url)
 const React = nodeRequire('react')
 const ReactDOMClient = nodeRequire('react-dom/client')
 const { act } = nodeRequire('react')
+
+// --- assertions ---------------------------------------------------------------
+// A check failure never stops the run: every mismatch is collected and reported,
+// so one broken rule still shows what the rest of the panel does.
+const failures = []
+const check = (name, actual, expected) => {
+	const ok = JSON.stringify(actual) === JSON.stringify(expected)
+	console.log(ok ? `PASS ${name}` : `FAIL ${name}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`)
+	if (!ok) failures.push(name)
+}
 
 const dom = new JSDOM('<!doctype html><html lang="zh"><head></head><body><div id="root"></div></body></html>', {
 	url: 'http://127.0.0.1:56542/',
@@ -36,11 +46,17 @@ console.log('exports:', Object.keys(mod).sort().join(', '))
 // --- stub the host route ------------------------------------------------------
 const DAY = 86_400_000
 const today = new Date()
+const yearPrefix = `${today.getFullYear()}-`
 const days = []
 for (let offset = 400; offset >= 0; offset -= 1) {
 	const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - offset)
 	const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-	const value = offset % 7 === 0 ? 0 : (offset % 5) + 1
+	/*
+	 * One deliberately enormous day from last year: if the colour scale or the cards
+	 * ever fall back to the whole history, this value flattens the current year and
+	 * the assertions below catch it.
+	 */
+	const value = key.startsWith(yearPrefix) ? (offset % 7 === 0 ? 0 : (offset % 5) + 1) : offset === 400 ? 400 : 0
 	if (value > 0) days.push({ day: key, messages: value, sessions: 1 + (value % 3) })
 }
 const payload = {
@@ -100,9 +116,9 @@ function dictionaryZh() {
 		'page.subtitle': '每天发出的对话条数',
 		'metric.messages': '消息',
 		'metric.sessions': '会话',
-		'stat.total': '总对话',
-		'stat.totalSessions': '总会话',
-		'stat.activeDays': '活跃 {n} 天',
+		'stat.total': '今年对话',
+		'stat.totalSessions': '今年会话',
+		'stat.activeDays': '今年活跃 {n} 天',
 		'stat.streak': '当前连续',
 		'stat.longest': '最长 {n} 天',
 		'stat.month': '本月',
@@ -110,7 +126,7 @@ function dictionaryZh() {
 		'stat.busiest': '最忙一天',
 		'stat.none': '暂无记录',
 		'stat.unit': '{n} 天',
-		'chart.range': '过去 53 周',
+		'chart.range': '{year} 年全年',
 		'chart.less': '少',
 		'chart.more': '多',
 		'chart.empty': '还没有记录到对话',
@@ -176,6 +192,38 @@ console.log('stats:', stats)
 console.log('fetch calls:', calls.length, calls[0]?.url, 'credentials:', calls[0]?.init?.credentials)
 console.log('foot:', container.querySelector('.dcv-foot')?.textContent)
 
+// --- the grid is always one full year, and every card agrees with it ----------
+const yearDays = days.filter((item) => item.day.startsWith(yearPrefix))
+const lastYearDays = days.filter((item) => !item.day.startsWith(yearPrefix))
+const yearMessages = yearDays.reduce((sum, item) => sum + item.messages, 0)
+const yearBusiest = Math.max(...yearDays.map((item) => item.messages))
+const zhCount = (value) => new Intl.NumberFormat('zh').format(value)
+const cardValues = [...container.querySelectorAll('.dcv-stat-value')].map((node) => node.textContent)
+const activeSub =
+	yearDays.length === 1 ? '今年活跃 1 天' : `今年活跃 ${zhCount(yearDays.length)} 天`
+
+check('grid draws a whole year', cells.length, 371)
+check('months run january to december', months, ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'])
+check('future squares exist', future > 0, true)
+check('fixture spans two years', lastYearDays.length > 0, true)
+check('total counts this year only', cardValues[0], zhCount(yearMessages))
+check('active days count this year only', container.querySelector('.dcv-stat-sub')?.textContent, activeSub)
+check('busiest day stays inside the year', cardValues[3], zhCount(yearBusiest))
+check('colour scale ignores last year', Math.max(...[...cells].map((cell) => Number(cell.dataset.l))), 4)
+
+// A future square reports its date and nothing else.
+const futureCell = [...cells].find((cell) => cell.dataset.future === '1')
+await act(async () => {
+	futureCell.dispatchEvent(new window.MouseEvent('mouseover', { bubbles: true }))
+})
+const futureTipText = document.querySelector('.dcv-tip')?.textContent ?? ''
+console.log('future tooltip:', futureTipText)
+check('future square names its date', /年/.test(futureTipText) && /日/.test(futureTipText), true)
+check('future square reports no count', /条消息|没有对话|tokens/.test(futureTipText), false)
+await act(async () => {
+	futureCell.dispatchEvent(new window.MouseEvent('mouseout', { bubbles: true }))
+})
+
 // Hover one filled cell and read the tooltip the way a user would.
 const target = [...cells].find((cell) => Number(cell.dataset.l) > 0)
 await act(async () => {
@@ -205,4 +253,5 @@ console.log('refresh calls:', calls.map((c) => c.url).join(' , '))
 
 console.log('react errors:', errors.length)
 if (errors.length) console.log(errors.slice(0, 5).join('\n---\n'))
-process.exit(errors.length ? 1 : 0)
+console.log(failures.length ? `FAILED checks: ${failures.join(', ')}` : 'ALL CHECKS PASSED')
+process.exit(errors.length + failures.length ? 1 : 0)

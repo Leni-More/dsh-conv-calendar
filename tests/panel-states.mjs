@@ -1,4 +1,4 @@
-﻿// Edge-case render test: empty payload, failing route, and an English document.
+// Edge-case render test: empty payload, failing route, and an English document.
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { JSDOM } from 'jsdom'
@@ -85,9 +85,21 @@ const today = new Date()
 const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 const emptyPayload = { version: 1, timeZone: 'Asia/Shanghai', today: todayKey, days: [], meta: { updatedAt: 0, sessions: 0, activeDays: 0, totalMessages: 0 }, history: { available: true }, historyPending: true }
 
+// The grid is a fixed shape: a year of squares whether or not anything is recorded.
+const failures = []
+const check = (name, actual, expected) => {
+	const ok = JSON.stringify(actual) === JSON.stringify(expected)
+	console.log(ok ? `PASS ${name}` : `FAIL ${name}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`)
+	if (!ok) failures.push(name)
+}
+const twelveMonths = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+const twelveYearMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 const empty = await mount({ html: pageHtml('zh'), payload: emptyPayload, language: 'zh' })
 console.log('EMPTY cells:', empty.cells, '| empty card:', empty.empty, '| stats:', empty.stats, '| errors:', empty.errors.length)
 console.log('EMPTY foot:', empty.text.includes('扫描') ? 'shows scanning note' : 'no scanning note')
+check('empty panel still draws a year', empty.cells, 371)
+check('empty panel labels every month', empty.months, twelveMonths)
 
 const failed = await mount({ html: pageHtml('zh'), fail: true, language: 'zh' })
 console.log('ERROR card:', failed.error, '| errors:', failed.errors.length)
@@ -105,3 +117,9 @@ console.log('EN title:', english.text.slice(0, 24))
 console.log('EN stats:', english.stats)
 console.log('EN months:', english.months.join(' '))
 console.log('EN cells:', english.cells, '| errors:', english.errors.length)
+check('english panel draws a year', english.cells, 371)
+check('english month labels', english.months, twelveYearMonths)
+check('english cards name the year', english.stats[0]?.includes('this year'), true)
+
+console.log(failures.length ? `FAILED checks: ${failures.join(', ')}` : 'ALL CHECKS PASSED')
+process.exit(failures.length || empty.errors.length || failed.errors.length || english.errors.length ? 1 : 0)

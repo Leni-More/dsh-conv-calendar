@@ -12,7 +12,7 @@ Both directories need the same two files:
 
 | File | What it should show |
 | --- | --- |
-| `panel.png` | The whole panel in the Web GUI — sidebar entry highlighted, four stat cards, the full 53-week grid with a few months of real activity |
+| `panel.png` | The whole panel in the Web GUI — sidebar entry highlighted, four stat cards, the full-year grid with a few months of real activity |
 | `tooltip.png` | A close-up of one day hovered under the **Tokens** metric, with the `in · out · cached` breakdown visible |
 
 > In the Chinese set the metric switch reads 消息 / 会话 / Token / 输出 and the tooltip
@@ -35,7 +35,7 @@ All four images are in place.
 2. **Pick the language first**: Settings → General → Language. The panel re-renders in
    place, so you can shoot one language, switch, and shoot the other without restarting.
 3. Open **Conversation calendar** in the sidebar.
-4. For `panel.png`, capture the whole window; keep it ~1200 px wide so the 53 columns fit.
+4. For `panel.png`, capture the whole window; keep it ~1200 px wide so all columns of the year fit.
 5. For `tooltip.png`, hover a shaded square under the **Token** metric until the tooltip
    with `in · out · cached` shows, then capture that region only.
 6. Trim the browser chrome and save as PNG under the matching directory.

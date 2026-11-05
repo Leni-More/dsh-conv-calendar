@@ -137,7 +137,7 @@ const expectTotals = {
 /** Mirror of the panel's compact token formatting, spelled out independently. */
 const compact = (value) =>
 	value < 1000 ? String(value) : value < 1_000_000 ? `${(value / 1000).toFixed(value < 10_000 ? 1 : 0)}k` : `${(value / 1_000_000).toFixed(value < 10_000_000 ? 1 : 0)}M`
-const labels = ['总对话', '总会话', '总 Token', '输出 Token']
+const labels = ['今年对话', '今年会话', '今年 Token', '今年输出 Token']
 const keys = ['messages', 'sessions', 'tokens', 'output']
 console.log('expected totals:', expectTotals)
 

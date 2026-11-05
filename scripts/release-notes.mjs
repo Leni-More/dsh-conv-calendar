@@ -19,9 +19,18 @@ if (start < 0) {
 	process.exit(0)
 }
 
-const after = changelog.slice(start + heading.length)
+const after = changelog.slice(skipHeadingLine(changelog, start, heading.length))
 const nextHeading = after.search(/\n## \[/)
 const section = (nextHeading < 0 ? after : after.slice(0, nextHeading)).trim()
+
+/**
+ * The heading may carry a trailing release date (`## [0.2.0] - 2026-11-05`), so the
+ * notes start after the whole line rather than after the bracket.
+ */
+function skipHeadingLine(text, start, length) {
+	const lineEnd = text.indexOf('\n', start + length)
+	return lineEnd < 0 ? text.length : lineEnd + 1
+}
 
 writeFileSync(new URL('../notes.md', import.meta.url), `${section || `Release ${version}`}\n`)
 console.log(`wrote notes for ${version} (${section.length} chars)`)

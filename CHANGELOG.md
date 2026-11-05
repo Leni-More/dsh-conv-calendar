@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-05
+
+### Changed
+
+- **The grid always shows the whole current calendar year.** It now spans 1 January to
+  31 December, padded out to whole Monday-started weeks, instead of a rolling 53-week
+  window that ended on the current week. Days that have not arrived yet keep their
+  squares, and the month labels cover the remaining months too, so the year no longer
+  looks truncated in November and December.
+- **Every card and the colour scale now use the grid's year scope.** The total, the
+  active-day count, the busiest day and the maximum that drives the five shades are all
+  computed over the current calendar year, so the numbers agree with the squares the
+  user can see and one heavy day from a previous year can no longer wash the current
+  year out to level 1. The card labels say "this year". The streaks still walk the full
+  history, because an unbroken run may cross 1 January.
+- **A future square now answers its hover with its date.** It carries no count, so the
+  tooltip shows the date alone, and the hover outline applies to it like any other
+  square.
+
 ## [0.1.1]
 
 ### Fixed

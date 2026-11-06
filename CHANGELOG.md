@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-05
+
 ### Changed
 
 - **The hover tooltip speaks in the card-label colour.** Its text used the inverted

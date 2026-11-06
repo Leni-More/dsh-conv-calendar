@@ -220,6 +220,15 @@ const futureTipText = document.querySelector('.dcv-tip')?.textContent ?? ''
 console.log('future tooltip:', futureTipText)
 check('future square names its date', /年/.test(futureTipText) && /日/.test(futureTipText), true)
 check('future square reports no count', /条消息|没有对话|tokens/.test(futureTipText), false)
+
+// The tooltip has to speak in the same colour as the card labels beside the grid.
+const cssText = document.querySelector('style[data-plugin-css]')?.textContent ?? ''
+const colorOf = (selector) => {
+	const block = cssText.match(new RegExp(`${selector.replace(/\./g, '\\.')}\\{([^}]*)\\}`))
+	return block?.[1].match(/color:([^;]+)/)?.[1]?.trim()
+}
+check('tooltip text uses the card label colour', colorOf('.dcv-tip'), colorOf('.dcv-stat-label'))
+check('card label colour found', colorOf('.dcv-stat-label'), 'var(--dcv-faint)')
 await act(async () => {
 	futureCell.dispatchEvent(new window.MouseEvent('mouseout', { bubbles: true }))
 })

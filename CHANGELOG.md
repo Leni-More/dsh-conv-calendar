@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The hover tooltip speaks in the card-label colour.** Its text used the inverted
+  primary colour; it now uses the same `--dcv-faint` token as the labels of the cards
+  above the grid, and the date line no longer dims itself further, so a hovered day
+  reads like part of the same surface instead of a separate bright slab.
+
 ## [0.2.0] - 2026-11-05
 
 ### Changed

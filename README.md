@@ -35,7 +35,7 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
 - **Token breakdown.** Under *Tokens* and *Output*, hovering a square also shows the `input · output · cached` split; hovering a future square shows its date alone.
 - **Theme-aware.** Colors come from DSH theme variables, so light and dark mode both look native.
 - **Bilingual.** Follows the UI language (English / Chinese).
-- **One quiet ask.** The first time the panel opens after installation, a small card asks for a GitHub star and points at the issue tracker. That is the whole budget: one greeting per installed copy, never a second one — reinstalling counts as a new copy and earns one more. It waits for the page to settle and for you to stop typing before it shows up at all.
+- **One quiet ask.** Each time the plug-in is switched on, the first page that opens shows a small card asking for a GitHub star and pointing at the issue tracker, then keeps quiet until the next time it is switched on. It waits for the page to settle and for you to stop typing before it appears at all.
 
 ## Requirements
 

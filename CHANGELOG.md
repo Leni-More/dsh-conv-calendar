@@ -8,18 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.1] - 2026-11-11
 
+### Changed
+
+- **The star card is now tied to activation, not to a counter.** The Host applies the
+  plug-in every time the desktop app starts and every time it is switched on, so that is
+  the moment it hands out one greeting: the first page that asks gets the card, every later
+  load and every second tab is told no, and the next activation starts over. The decision
+  lives only in memory.
+
 ### Fixed
 
-- **The star card now appears on a fresh install.** It was bounded by a budget of three
+- **The star card now shows up.** It used to be bounded by a budget of three
   appearances, a week apart, remembered in `notice.json`. Uninstalling a plugin never
   deletes that file, so a reinstall inherited "already asked" and the card silently never
-  appeared for the person who had just installed it.
-- **The card greets each installed copy once, and only once.** The policy is now keyed to
-  the installation instead of a counter: the record stores the creation time of the
-  package directory, so the first page load after installing asks for a star, and no later
-  load does. Reinstalling creates a new directory, hence a new greeting; upgrading in
-  place keeps the old one, hence silence. Nothing is capped and nothing cools down, so a
-  stale file can no longer mute the card.
+  appeared for the person who had just installed it. Nothing is written to disk any more,
+  so no leftover file can mute it.
 - **A background window no longer swallows the ask.** The prompt used to give up when the
   tab was hidden. It now waits for `visibilitychange` and asks as soon as the window is
   looked at.

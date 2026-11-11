@@ -197,7 +197,10 @@ check('cache header', fifth.headers['cache-control'], 'no-store')
 //    closed for good by a real answer. One assertion per rule of the policy.
 const noticePath = `${home}/plugins/dsh-conv-calendar/notice.json`
 const firstAsk = await call('/dsh-conv-calendar/api/star-notice')
-check('notice asks once', { show: firstAsk.json.show, reason: firstAsk.json.reason }, { show: true, reason: 'first' })
+check('notice asks once', { show: firstAsk.json.show, reason: firstAsk.json.reason }, {
+	show: true,
+	reason: 'installed',
+})
 check('notice file written', existsSync(noticePath), true)
 /* A second tab inside the throttle window gets the same verdict, not a refusal. */
 check('notice answers a second tab alike', (await call('/dsh-conv-calendar/api/star-notice')).json.show, true)
@@ -219,20 +222,20 @@ check(
 )
 
 const api = await import(`../lib/index.js?ts=${Date.now()}`)
-check('a fresh record shows', api.noticeDecision({ shows: 0, lastAt: 0, action: null }), {
+const stamp = api.installStamp()
+/* A copy that has not been greeted yet is greeted once, whatever the file says. */
+check('a new copy is greeted', api.noticeDecision(api.loadNotice(noticePath), 'a-new-copy'), {
 	show: true,
-	reason: 'first',
+	reason: 'installed',
 })
-/* The old build hid the card behind a week of cooldown, which a reinstall inherited. */
-check('a recent showing does not hide it', api.noticeDecision({ shows: 1, lastAt: Date.now(), action: null }), {
-	show: true,
-	reason: 'again',
-})
-check('no showing budget caps it', api.noticeDecision({ shows: 3, lastAt: 0, action: null }), {
-	show: true,
-	reason: 'again',
-})
-check('a star ends the conversation', api.noticeDecision(api.loadNotice(noticePath)), { show: false, reason: 'answered' })
+/* The same copy never asks again, however the plug-in was reloaded. */
+check(
+	'the same copy stays quiet',
+	api.noticeDecision({ version: 3, install: 'a-new-copy', shownAt: Date.now(), action: null }, 'a-new-copy'),
+	{ show: false, reason: 'asked' },
+)
+check('the stamp is stable', api.installStamp(), stamp)
+check('the stamp is not the clock', /^\d+$/.test(stamp), true)
 
 // 7. The state file was written and reloads to the same numbers.
 check('state file written', existsSync(`${home}/plugins/dsh-conv-calendar/state.json`), true)

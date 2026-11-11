@@ -6,6 +6,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-11
+
+### Added
+
+- **The panel asks once for a star, and makes it easy to argue with.** The first time
+  the calendar opens, a small card asks for a GitHub star and points at the issue
+  tracker. It is a courtesy, so it is bounded: at most three appearances ever, never two
+  inside the same week, and nothing at all once the user has followed the star link or
+  opened an issue (`dismissed` only postpones the next question). Two tabs opened
+  together spend one showing between them, not two.
+- **The Host owns the decision, and remembers it in a file.** The answer lives in
+  `notice.json`, beside `state.json` and deliberately separate from it. The Desktop host
+  binds a fresh random loopback port on every restart, so `localStorage` would forget the
+  answer along with the old origin; `state.json` is a rebuildable cache that a future
+  counter-layout change will discard. A user's answer is neither, so it gets its own file.
+- **Its own route, so reading the calendar costs nothing.** `GET` and `POST
+  /dsh-conv-calendar/api/star-notice` carry the decision and the answer. The summary route
+  is untouched, so a passive panel refresh never spends one of the three showings.
+- **A prompt that does not interrupt.** The card waits for the first paint to settle and
+  for the composer to go idle, closes on `Escape`, on the backdrop or on any button,
+  keeps focus inside itself while open and hands it back afterwards, and is built as
+  plain DOM on `document.body`: it has to paint above the whole shell, and `react-dom`'s
+  `createRoot` is not guaranteed to exist in every host build.
+- **The panel keeps a quiet way back.** The calendar footer now carries *Star* and
+  *Feedback* links, so the one-time ask is not the only path to the repository.
+- **An icon of its own.** `icon.svg` puts the shape the sidebar already uses — a calendar
+  frame with a two-row heat strip — on the brand indigo, and `package.json` carries both
+  the `icon` field and the file inside `files`, so the mark survives publishing instead
+  of existing only in the repository. The panel title wears the same glyph at 18px,
+  tinted with `--dcv-accent`.
+
+### Changed
+
+- **Both routes now share one JSON responder.** `respondJson` owns the status line, the
+  cache headers, the `HEAD` body rule and the 500 fallback, so the new route could not
+  drift away from the old one; a payload that cannot be serialised becomes a `500`
+  instead of a half-written response.
+
 ## [0.2.1] - 2026-11-05
 
 ### Changed

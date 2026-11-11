@@ -1,6 +1,6 @@
 // Load the plugin through the real cordis runtime with a stubbed Web carrier and
 // session-query service, then drive the HTTP handler the way the server does.
-import { existsSync, rmSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { Context } from '@deepseek-ai/cordis'
@@ -77,22 +77,40 @@ const plugin = await import('../lib/index.js')
 const fork = ctx.plugin(plugin)
 await new Promise((resolve) => setTimeout(resolve, 200))
 
-check('route', routes.map((route) => `${route.kind} ${route.path}`), ['exact /dsh-conv-calendar/api/summary'])
+check('route', routes.map((route) => `${route.kind} ${route.path}`), [
+	'exact /dsh-conv-calendar/api/summary',
+	'exact /dsh-conv-calendar/api/star-notice',
+])
 check('load errors', errors.length, 0)
 
-const call = async (url, method = 'GET') => {
+const routeOf = (url) => {
+	const path = url.split('?')[0]
+	const route = routes.find((item) => item.path === path)
+	if (!route) throw new Error(`no route for ${url}`)
+	return route
+}
+
+const call = async (url, method = 'GET', body = undefined) => {
 	const chunks = []
+	const request = {
+		method,
+		url,
+		headers: {},
+		async *[Symbol.asyncIterator]() {
+			if (body !== undefined) yield Buffer.from(body)
+		},
+	}
 	const response = {
 		statusCode: 0,
 		headers: {},
 		setHeader(name, value) {
 			this.headers[name.toLowerCase()] = value
 		},
-		end(body) {
-			if (body !== undefined) chunks.push(Buffer.from(body))
+		end(chunk) {
+			if (chunk !== undefined) chunks.push(Buffer.from(chunk))
 		},
 	}
-	await routes[0].handler({ method, url, headers: {} }, response)
+	await routeOf(url).handler(request, response)
 	return {
 		status: response.statusCode,
 		headers: response.headers,
@@ -175,13 +193,58 @@ const post = await call('/dsh-conv-calendar/api/summary', 'POST')
 check('POST status', post.status, 405)
 check('cache header', fifth.headers['cache-control'], 'no-store')
 
-// 6. The state file was written and reloads to the same numbers.
+// 6. The star prompt is decided by the Host, remembered in a file of its own, and
+//    closed for good by a real answer. One assertion per rule of the policy.
+const noticePath = `${home}/plugins/dsh-conv-calendar/notice.json`
+const firstAsk = await call('/dsh-conv-calendar/api/star-notice')
+check('notice asks once', { show: firstAsk.json.show, reason: firstAsk.json.reason }, { show: true, reason: 'first' })
+check('notice file written', existsSync(noticePath), true)
+check('notice throttles a second tab', (await call('/dsh-conv-calendar/api/star-notice')).json.show, false)
+check(
+	'notice rejects an unknown answer',
+	(await call('/dsh-conv-calendar/api/star-notice', 'POST', '{"action":"nope"}')).status,
+	400,
+)
+check('notice rejects an empty body', (await call('/dsh-conv-calendar/api/star-notice', 'POST', '')).status, 400)
+check(
+	'notice records the answer',
+	(await call('/dsh-conv-calendar/api/star-notice', 'POST', '{"action":"starred"}')).json,
+	{ ok: true, action: 'starred' },
+)
+check(
+	'notice refuses a later dismissal',
+	(await call('/dsh-conv-calendar/api/star-notice', 'POST', '{"action":"dismissed"}')).json,
+	{ ok: true, action: 'starred' },
+)
+
+const api = await import(`../lib/index.js?ts=${Date.now()}`)
+check('a fresh record shows', api.noticeDecision({ shows: 0, lastAt: 0, action: null }), { show: true, reason: 'first' })
+check('the week cools it down', api.noticeDecision({ shows: 1, lastAt: Date.now(), action: null }), {
+	show: false,
+	reason: 'cooling',
+})
+check('three showings is the cap', api.noticeDecision({ shows: 3, lastAt: 0, action: null }), {
+	show: false,
+	reason: 'capped',
+})
+check('a star ends the conversation', api.noticeDecision(api.loadNotice(noticePath)), { show: false, reason: 'answered' })
+
+// 7. The state file was written and reloads to the same numbers.
 check('state file written', existsSync(`${home}/plugins/dsh-conv-calendar/state.json`), true)
 const reloaded = (await import(`../lib/index.js?ts=${Date.now()}`)).loadState(
 	`${home}/plugins/dsh-conv-calendar/state.json`,
 )
 check('reloaded sessions', Object.keys(reloaded.sessions).sort(), ['session-closed', 'session-live'])
 check('reloaded final flags', Object.values(reloaded.sessions).map((record) => record.final), [true, true])
+
+// 8. The icon is declared, packaged and drawn. An icon that lives only in the
+// repository works locally and 404s once published, so both halves are checked.
+const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+check('manifest icon', manifest.icon, './icon.svg')
+check('icon listed for publishing', manifest.files.includes('icon.svg'), true)
+const icon = readFileSync(new URL('../icon.svg', import.meta.url), 'utf8')
+check('icon is an svg document', icon.trimStart().startsWith('<svg'), true)
+check('icon on one grid', icon.includes('viewBox="0 0 24 24"'), true)
 
 await fork.dispose()
 check('routes removed on dispose', routes.length, 0)

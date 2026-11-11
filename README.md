@@ -1,5 +1,9 @@
 # dsh-conv-calendar
 
+<p align="center">
+  <img src="icon.svg" alt="dsh-conv-calendar" width="72" height="72">
+</p>
+
 **English** | [中文](README.zh-CN.md)
 
 A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — see how many prompts you sent, how many conversations you had, and how many tokens you burned, one square per day.
@@ -31,6 +35,7 @@ A GitHub-style contribution calendar for [DeepSeek Harness](https://github.com/d
 - **Token breakdown.** Under *Tokens* and *Output*, hovering a square also shows the `input · output · cached` split; hovering a future square shows its date alone.
 - **Theme-aware.** Colors come from DSH theme variables, so light and dark mode both look native.
 - **Bilingual.** Follows the UI language (English / Chinese).
+- **One quiet ask.** The first time the panel opens, a small card asks for a GitHub star and points at the issue tracker. It appears at most three times ever, never twice inside a week, and never again once you have followed either link — and it waits for the page to settle and for you to stop typing before it shows up at all.
 
 ## Requirements
 
@@ -142,6 +147,15 @@ The response is JSON:
 - `historyPending` — whether a backfill is currently running
 
 The endpoint uses the Host's connection fence (`ctx.connection.requestRejection`): a request without the session cookie gets `401`, so a loopback-only deployment never exposes the numbers.
+
+The star prompt has a route of its own, so merely reading the calendar never spends one of its three showings:
+
+```
+GET  /dsh-conv-calendar/api/star-notice   # { show, reason, shows, answered } — spends a showing when show is true
+POST /dsh-conv-calendar/api/star-notice   # { "action": "starred" | "issue" | "dismissed" }
+```
+
+The answer is stored in `notice.json`, beside `state.json` and separate from it. The Desktop host binds a fresh random loopback port on every restart, so `localStorage` would forget the answer along with the old origin — and `state.json` is a rebuildable cache that a future layout change may discard. A user's answer is neither, so it lives in its own file.
 
 ## How it is built
 

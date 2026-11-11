@@ -1,5 +1,9 @@
 # dsh-conv-calendar · 对话日历
 
+<p align="center">
+  <img src="icon.svg" alt="dsh-conv-calendar" width="72" height="72">
+</p>
+
 [English](README.md) | **中文**
 
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 用的 GitHub 风格提交日历 —— 每天发了多少条对话、开了几个会话、烧了多少 token，一格一天，一眼看完。
@@ -31,6 +35,7 @@
 - **Token 明细**：Token / 输出模式下，悬停格子还会显示 `输入 · 输出 · 缓存` 拆分；悬停未来的格子只显示日期。
 - **深浅色自适应**：颜色取自 DSH 主题变量，不写死配色，亮色深色都像原生。
 - **中英双语**：跟随界面语言。
+- **一次安静的请求**：第一次打开面板时会浮出一张小卡片，请你给项目点个 GitHub Star，也欢迎直接把问题或想法提成 issue。它一生最多出现 3 次、一周内不重复，点过任一链接之后永久不再打扰；而且会等页面先稳定、等你停下手上的输入，才肯露面。
 
 ## 环境要求
 
@@ -142,6 +147,15 @@ GET /dsh-conv-calendar/api/summary?refresh=1  # 立即回填（面板上的「�
 - `historyPending` —— 当前是否有回填在跑
 
 接口沿用宿主的连接栅栏（`ctx.connection.requestRejection`）：没有会话 Cookie 的请求拿到 `401`，只监听回环地址的部署不会把数据暴露出去。
+
+星标提示另有独立接口，所以只是浏览日历不会消耗弹窗次数：
+
+```
+GET  /dsh-conv-calendar/api/star-notice   # { show, reason, shows, answered }，show 为 true 时消耗一次
+POST /dsh-conv-calendar/api/star-notice   # { "action": "starred" | "issue" | "dismissed" }
+```
+
+答案存在 `notice.json` 里，与 `state.json` 并列但彼此独立：Desktop 宿主每次重启都会换一个随机回环端口，`localStorage` 会跟着旧 origin 一起失忆；而 `state.json` 是可重建的缓存，将来改一次计数结构就会被丢掉。用户答过的话两者都不是，所以单独存一份。
 
 ## 实现说明
 

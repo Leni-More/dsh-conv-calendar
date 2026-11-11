@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-11
+
+### Fixed
+
+- **The star card now shows up on a fresh install.** It was bounded by a budget of three
+  appearances, a week apart, remembered in `notice.json`. Uninstalling a plugin never
+  deletes that file, so a reinstall inherited "already asked" and the card silently never
+  appeared for the person who had just installed it. Every page load now asks until the
+  user answers, and the record carries a version, so a file written by an older build is
+  ignored instead of gating the card.
+- **A background window no longer swallows the ask.** The prompt used to give up when the
+  tab was hidden, and the appearance had already been counted by then. It now waits for
+  `visibilitychange` and asks as soon as the window is looked at.
+
 ## [0.3.0] - 2026-11-11
 
 ### Added

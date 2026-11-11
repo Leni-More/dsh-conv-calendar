@@ -199,7 +199,8 @@ const noticePath = `${home}/plugins/dsh-conv-calendar/notice.json`
 const firstAsk = await call('/dsh-conv-calendar/api/star-notice')
 check('notice asks once', { show: firstAsk.json.show, reason: firstAsk.json.reason }, { show: true, reason: 'first' })
 check('notice file written', existsSync(noticePath), true)
-check('notice throttles a second tab', (await call('/dsh-conv-calendar/api/star-notice')).json.show, false)
+/* A second tab inside the throttle window gets the same verdict, not a refusal. */
+check('notice answers a second tab alike', (await call('/dsh-conv-calendar/api/star-notice')).json.show, true)
 check(
 	'notice rejects an unknown answer',
 	(await call('/dsh-conv-calendar/api/star-notice', 'POST', '{"action":"nope"}')).status,
@@ -218,14 +219,18 @@ check(
 )
 
 const api = await import(`../lib/index.js?ts=${Date.now()}`)
-check('a fresh record shows', api.noticeDecision({ shows: 0, lastAt: 0, action: null }), { show: true, reason: 'first' })
-check('the week cools it down', api.noticeDecision({ shows: 1, lastAt: Date.now(), action: null }), {
-	show: false,
-	reason: 'cooling',
+check('a fresh record shows', api.noticeDecision({ shows: 0, lastAt: 0, action: null }), {
+	show: true,
+	reason: 'first',
 })
-check('three showings is the cap', api.noticeDecision({ shows: 3, lastAt: 0, action: null }), {
-	show: false,
-	reason: 'capped',
+/* The old build hid the card behind a week of cooldown, which a reinstall inherited. */
+check('a recent showing does not hide it', api.noticeDecision({ shows: 1, lastAt: Date.now(), action: null }), {
+	show: true,
+	reason: 'again',
+})
+check('no showing budget caps it', api.noticeDecision({ shows: 3, lastAt: 0, action: null }), {
+	show: true,
+	reason: 'again',
 })
 check('a star ends the conversation', api.noticeDecision(api.loadNotice(noticePath)), { show: false, reason: 'answered' })
 
